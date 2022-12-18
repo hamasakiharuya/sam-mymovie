@@ -31,7 +31,7 @@ jobs:
         run: |
           aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
 
-      - if: ${{ step.check_s3_backet.outcome == 'failure' }}
+      - if: ${{ steps.check_s3_backet.outcome == 'failure' }}
         run: |
             aws s3 mb s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
 
