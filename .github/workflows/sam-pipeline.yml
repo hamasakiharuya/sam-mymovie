@@ -27,11 +27,11 @@ jobs:
 
       #S3 create
       - run: |
-        aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
-        status=$?
-        if [ $status -ne 0 ]; then
-          aws s3 mb s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
-        if
+          aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+          status=$?
+          if [ $status -ne 0 ]; then
+            aws s3 mb s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+          if 
 
 # Run Unit tests- Specify unit tests here 
 
