@@ -25,9 +25,15 @@ jobs:
       #- run : pip install -r tests/requirements.txt 
       #- run: pytest -s -k test_lambda_handler
 
+      #S3 create
+      - run: |
+        aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+        status=$?
+        if [ $status -ne 0 ]; then
+          aws s3 mb s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+        if
 
 # Run Unit tests- Specify unit tests here 
 
 # sam deploy
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --resolve-s3 --capabilities CAPABILITY_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=stg TMDBApiKey=${{ secrets.TMDB_API_KEY}}'
-      #- run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=stg TMDBApiKey=${{ secrets.TMDB_API_KEY}}'
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=stg TMDBApiKey=${{ secrets.TMDB_API_KEY}}'
