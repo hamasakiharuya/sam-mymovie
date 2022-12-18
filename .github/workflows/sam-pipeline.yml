@@ -26,8 +26,8 @@ jobs:
       #- run: pytest -s -k test_lambda_handler
 
       #S3 create
-      continue-on-error: true
-      - run: |
+      - continue-on-error: true
+        run: |
           aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
           status=$?
           if [ $status -ne 0 ]; then
