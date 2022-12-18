@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "mymovie"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-14nmiwdyg5240"
+s3_prefix = "mymovie"
+region = "ap-northeast-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "EnviromentType=\"stg\" TMDBApiKey=\"none\""
+image_repositories = []

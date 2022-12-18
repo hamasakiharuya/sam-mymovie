@@ -1,0 +1,1051 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  mymovie
+
+  Sample SAM Template for mymovie
+
+Parameters:
+  EnviromentType:
+    Type: String
+    Default: stg
+  TMDBApiKey:
+    Type: String
+    Default: none
+  
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+###cognito
+  MyMovieUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties: 
+      AliasAttributes: 
+        - email
+      AutoVerifiedAttributes: 
+        - email
+      LambdaConfig: 
+        PostConfirmation: !GetAtt CheckSignupFunction.Arn
+      Policies: 
+        PasswordPolicy: 
+          MinimumLength: 6
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireUppercase: true
+      Schema: 
+        - AttributeDataType: "String"
+          Name: "birthdate"
+          Required: true
+        - AttributeDataType: "String"
+          Name: "email"
+          Required: true
+        - AttributeDataType: "String"
+          Mutable: true
+          Name: "preferred_username"
+          Required: true
+        - AttributeDataType: "String"
+          Name: "website"
+          Required: true
+      UsernameConfiguration: 
+        CaseSensitive: false
+      UserPoolName: !Sub mymovie-${EnviromentType}-userpool
+
+  MyMovieUserPoolAppClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties: 
+      ClientName: MyMovie
+      EnableTokenRevocation: false
+      PreventUserExistenceErrors: ENABLED
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      UserPoolId: !Ref MyMovieUserPool
+
+###API Gateway
+  MyMovieAPIGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Sub mymovie-${EnviromentType}-apigw
+      EndpointConfiguration:
+        Type: REGIONAL
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          description: "get userid"
+          version: "1.0"
+          title: "mymovie"
+        basePath: "/MyMovieFunc"
+        schemes:
+        - "https"
+        paths:
+          /useremail:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CheckSignupFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\n  \"username\": \"$input.params('username')\",\n \
+                    \ \"email\": \"$input.params('email')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /userid:
+            get:
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUseIdFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /user:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "q"
+                in: "query"
+                required: true
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUseFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\n  \"user\": \"$input.params('q')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+            put:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "user"
+                in: "query"
+                required: false
+                type: "string"
+              - name: "a"
+                in: "query"
+                required: true
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdUseFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"user\": \"$input.params('user')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /movie:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "title"
+                in: "query"
+                required: true
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/APIGatewayToDynamodbRole"
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\n  \"TableName\": \"movie\",\n  \"IndexName\": \"title-user_id-index\"\
+                    ,\n  \"KeyConditions\": { \n    \"title\": {\n      \"ComparisonOperator\"\
+                    :\"EQ\",\n      \"AttributeValueList\": [{\"S\": \"$input.params('title')\"\
+                    }]\n      }\n  }\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+            delete:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "user_id"
+                in: "query"
+                required: false
+                type: "string"
+              - name: "title"
+                in: "query"
+                required: false
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - MyMovie: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CheckSignupFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"user_id\": \"$input.params('user_id')\",\n  \"\
+                    title\": \"$input.params('title')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+            post:
+              consumes:
+              - "application/x-www-form-urlencoded"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PosMovFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://d1z2nzx1vu4x24.cloudfront.net/index.html?list=register\"\
+                        )"
+                requestTemplates:
+                  application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
+                    \ insertion directly into a Lambda function\n\n## first we we set up our\
+                    \ variable that holds the tokenised key value pairs\n#set($httpPost =\
+                    \ $input.path('$').split(\"&\"))\n\n## next we set up our loop inside\
+                    \ the output structure\n{\n#foreach( $kvPair in $httpPost )\n ## now we\
+                    \ tokenise each key value pair using \"=\"\n #set($kvTokenised = $kvPair.split(\"\
+                    =\"))\n ## finally we output the JSON for this pair and add a \",\" if\
+                    \ this isn't the last pair\n \"$kvTokenised[0]\" : \"$kvTokenised[1]\"\
+                    #if( $foreach.hasNext ),#end\n#end\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /score:
+            post:
+              consumes:
+              - "application/x-www-form-urlencoded"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdMovFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://d1z2nzx1vu4x24.cloudfront.net/edit.html\")"
+                requestTemplates:
+                  application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
+                    \ insertion directly into a Lambda function\n\n## first we we set up our\
+                    \ variable that holds the tokenised key value pairs\n#set($httpPost =\
+                    \ $input.path('$').split(\"&\"))\n\n## next we set up our loop inside\
+                    \ the output structure\n{\n#foreach( $kvPair in $httpPost )\n ## now we\
+                    \ tokenise each key value pair using \"=\"\n #set($kvTokenised = $kvPair.split(\"\
+                    =\"))\n ## finally we output the JSON for this pair and add a \",\" if\
+                    \ this isn't the last pair\n \"$kvTokenised[0]\" : \"$kvTokenised[1]\"\
+                    #if( $foreach.hasNext ),#end\n#end\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /follow:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "user_id"
+                in: "query"
+                required: false
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/APIGatewayToDynamodbRole"
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\n  \"TableName\": \"follow\",\n  \"KeyConditions\"\
+                    : { \n    \"user_id\": {\n      \"ComparisonOperator\":\"EQ\",\n     \
+                    \ \"AttributeValueList\": [{\"S\": \"$input.params('user_id')\"}]\n  \
+                    \    }\n  }\n}"
+                passthroughBehavior: "when_no_templates"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /follow:
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "user_id"
+                in: "query"
+                required: false
+                type: "string"
+              - name: "follow"
+                in: "query"
+                required: false
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - MyMovies: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PosFolFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\n  \"user_id\": \"$input.params('user_id')\",\n  \"\
+                    follow\": \"$input.params('follow')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+            delete:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "user_id"
+                in: "query"
+                required: false
+                type: "string"
+              - name: "follow"
+                in: "query"
+                required: false
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - MyMovies: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DelFolFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"user_id\": \"$input.params('user_id')\",\n  \"\
+                    follow\": \"$input.params('follow')\"\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          /search:
+            get:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "query"
+                in: "query"
+                required: false
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                httpMethod: "GET"
+                uri: !Sub "https://api.themoviedb.org/3/search/movie?api_key=${TMDBApiKey}&language=ja-JA&page=1&include_adult=false"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestParameters:
+                  integration.request.querystring.query: "method.request.querystring.query"
+                passthroughBehavior: "when_no_match"
+                type: "http_proxy"
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+        securityDefinitions:
+          api_key:
+            type: "apiKey"
+            name: "x-api-key"
+            in: "header"
+          MyMovie:
+            type: "apiKey"
+            name: "Authorization"
+            in: "header"
+            x-amazon-apigateway-authtype: "cognito_user_pools"
+            x-amazon-apigateway-authorizer:
+              providerARNs:
+              - !GetAtt MyMovieUserPool.Arn
+              type: "cognito_user_pools"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
+
+###Lambda
+  CheckSignupFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub CheckSignup-${EnviromentType}-func
+      Description: "check username and email when signup"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: CheckSignup.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /useremail
+            Method: get
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  GetUseIdFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub GetUseId-${EnviromentType}-func
+      Description: "get a specific user"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: GetUseId.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /userid
+            Method: get
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  GetUseFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub GetUse-${EnviromentType}-func
+      Description: "get specific users all movie"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: GetUse.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /user
+            Method: get
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  PosUseFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub PosUse-${EnviromentType}-func
+      Description: "resigter user when signup"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: PosUse.lambda_handler
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+
+  UpdUseFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub UpdUse-${EnviromentType}-func
+      Description: "update username"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: UpdUse.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /user
+            Method: put
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  PosMovFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub PosMov-${EnviromentType}-func
+      Description: "register movie"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: PosMov.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /movie
+            Method: post
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  DelMovFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub DelMov-${EnviromentType}-func
+      Description: "delete movie"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: DelMov.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /movie
+            Method: delete
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  UpdMovFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub UpdMov-${EnviromentType}-func
+      Description: "update movie score"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: UpdMov.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /movie
+            Method: post
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  PosFolFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub PosFol-${EnviromentType}-func
+      Description: "follow"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Handler: PosFol.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /follow
+            Method: post
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+  DelFolFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: !Sub DelFol-${EnviromentType}-func
+      Description: "release follow"
+      CodeUri: lambda_code/
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonCognitoReadOnly
+      Handler: DelFol.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        MyMovie:
+          Type: Api
+          Properties:
+            Auth:
+              ApiKeyRequired: true
+            Path: /follow
+            Method: delete
+            RestApiId:
+              Ref: MyMovieAPIGateway
+
+Outputs:
+  APIGateWayID:
+    Description: "mymovie apigateway stage id"
+    Value: !GetAtt MyMovieAPIGateway.RootResourceId
+
+
+
