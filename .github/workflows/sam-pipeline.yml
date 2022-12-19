@@ -24,6 +24,15 @@ jobs:
       #test
       #- run : pip install -r tests/requirements.txt 
       #- run: pytest -s -k test_lambda_handler
+      - run : |
+          apt install python3-pip
+          pip3 install cfn-lint
+          pip3 install pydot
+          cfn-lint ./template.yaml
+
+  build:
+    commands:
+      - cfn-lint template/*.yml
 
       #S3 create
       - id: check_s3_backet
