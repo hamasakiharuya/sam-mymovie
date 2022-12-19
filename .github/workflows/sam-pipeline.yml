@@ -30,10 +30,6 @@ jobs:
           pip3 install pydot
           cfn-lint ./template.yaml
 
-  build:
-    commands:
-      - cfn-lint template/*.yml
-
       #S3 create
       - id: check_s3_backet
         continue-on-error: true
