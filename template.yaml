@@ -874,7 +874,7 @@ Resources:
           Properties:
             Auth:
               ApiKeyRequired: true
-            Path: /score
+            Path: /movie
             Method: post
             RestApiId:
               Ref: MyMovieAPIGateway
