@@ -710,7 +710,7 @@ Resources:
     Properties: 
       Name: !Sub MyMovie-${EnviromentType}-apikry
       StageKeys: 
-        - RestApiId: !GetAtt MyMovieAPIGateway.RootResourceId
+        - RestApiId: !Ref MyMovieAPIGateway
           StageName: !Sub mymovie-${EnviromentType}-apigw
       Tags: 
         - Key: "Env"
