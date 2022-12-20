@@ -708,10 +708,6 @@ Resources:
   MyMovieApikey:
     Type: AWS::ApiGateway::ApiKey
     Properties: 
-      CustomerId: String
-      Description: String
-      Enabled: 
-      GenerateDistinctId: Boolean
       Name: !Sub MyMovie-${EnviromentType}-apikry
       StageKeys: 
         - RestApiId: !GetAtt MyMovieAPIGateway.RootResourceId
