@@ -706,8 +706,9 @@ Resources:
 
 ###ApiKey
   MyMovieApikey:
-    Type: AWS::ApiGateway::ApiKey
+    Type: AWS::ApiGateway::ApiKeyapi
     Properties: 
+      Enabled: true
       Name: !Sub MyMovie-${EnviromentType}-apikry
       StageKeys: 
         - RestApiId: !Ref MyMovieAPIGateway
