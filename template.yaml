@@ -704,6 +704,22 @@ Resources:
             type: "object"
             title: "Empty Schema"
 
+###ApiKey
+  MyMovieApikey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties: 
+      CustomerId: String
+      Description: String
+      Enabled: 
+      GenerateDistinctId: Boolean
+      Name: !Sub MyMovie-${EnviromentType}-apikry
+      StageKeys: 
+        - RestApiId: !GetAtt MyMovieAPIGateway.RootResourceId
+          StageName: !Sub mymovie-${EnviromentType}-apigw
+      Tags: 
+        - Key: "Env"
+          Value: !Sub ${EnviromentType}
+
 ###Lambda
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
@@ -929,6 +945,8 @@ Outputs:
   APIGateWayID:
     Description: "mymovie apigateway stage id"
     Value: !GetAtt MyMovieAPIGateway.RootResourceId
+    Export:
+      Name: MyMovieApiGatewayId
 
 
 
