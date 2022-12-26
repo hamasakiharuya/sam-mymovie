@@ -53,7 +53,7 @@ Resources:
             Action:
               'sts:AssumeRole'
       Description: "IamRole for apigateway accesslog fron firehose to s3"
-      RoleName: !Sub S3Access-${EnviromentType}-apigwlog-role"
+      RoleName: !Sub "S3Access-${EnviromentType}-apigwlog-role"
       Tags: 
         - Key: env
           Value: !Sub "${EnviromentType}"
