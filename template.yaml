@@ -19,7 +19,81 @@ Globals:
     MemorySize: 128
 
 Resources:
-###cognito
+########## Config for APIGateWay AccessLog (S3 IAM Firehose)
+###S3
+  ApiGwAccessLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault: 
+              SSEAlgorithm: AES256
+      BucketName: !Sub apigwaccesslog-${EnviromentType}-${AWS::AccountId}
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true 
+        BlockPublicPolicy: true 
+        IgnorePublicAcls: true 
+        RestrictPublicBuckets: true 
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+###IAM Role
+  APiGatewayAccessLogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                firehose.amazonaws.com
+            Action:
+              'sts:AssumeRole'
+      Description: "IamRole for apigateway accesslog fron firehose to s3"
+      RoleName: !Sub S3Access-${EnviromentType}-apigwlog-role"
+      Tags: 
+        - Key: env
+          Value: !Sub "${EnviromentType}"
+
+###IAM Policy
+  PutApigwLogPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Action: 
+              - "s3:AbortMultipartUpload"
+              - "s3:GetBucketLocation"
+              - "s3:GetObject"
+              - "s3:ListBucket"
+              - "s3:ListBucketMultipartUploads"
+              - "s3:PutObject"
+            Resource:
+              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}"
+              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}/*"
+      PolicyName: !Sub "PutApigeLog-${EnviromentType}-policy"
+      Roles: 
+        - !Ref APiGatewayAccessLogRole
+
+###Firehose
+  ApigwLogDeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: !Sub apigatewaylog-${EnviromentType}-fh
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !GetAtt ApiGwAccessLogBucket.Arn
+        RoleARN: !GetAtt APiGatewayAccessLogRole.Arn
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+###Cognito
   MyMovieUserPool:
     Type: AWS::Cognito::UserPool
     Properties: 
@@ -70,6 +144,9 @@ Resources:
   MyMovieAPIGateway:
     Type: AWS::Serverless::Api
     Properties:
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApigwLogDeliveryStream.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }\n'
       StageName: !Sub mymovie-${EnviromentType}-apigw
       EndpointConfiguration:
         Type: REGIONAL
