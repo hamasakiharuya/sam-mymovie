@@ -35,6 +35,9 @@ Resources:
         BlockPublicPolicy: true 
         IgnorePublicAcls: true 
         RestrictPublicBuckets: true 
+      OwnershipControls:
+        Rules:
+          ObjectOwnership: BucketOwnerEnforced
       Tags:
         - Key: env
           Value: !Sub ${EnviromentType}
@@ -793,6 +796,7 @@ Resources:
       Tags: 
         - Key: "Env"
           Value: !Sub ${EnviromentType}
+      Value: !Sub ${MyMovieApiKey}
 
 ###Lambda
   CheckSignupFunction:
