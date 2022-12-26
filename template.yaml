@@ -99,6 +99,18 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
+###SSM parameter
+  MyMvoieApiKeyValue:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      Description: "MyMovie Apikey Value"
+      Name: "MyMovieApiKey"
+      Type: String
+      Value: !Sub ${MyMovieApiKey}
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
 ###Cognito
   MyMovieUserPool:
     Type: AWS::Cognito::UserPool
