@@ -108,8 +108,7 @@ Resources:
       Type: String
       Value: !Sub ${MyMovieApiKey}
       Tags:
-        - Key: env
-          Value: !Sub ${EnviromentType}
+        env: !Sub ${EnviromentType}
 
 ###Cognito
   MyMovieUserPool:
