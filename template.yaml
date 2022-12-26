@@ -99,6 +99,7 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
+
 ###SSM parameter
   MyMvoieApiKeyValue:
     Type: AWS::SSM::Parameter
