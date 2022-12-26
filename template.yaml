@@ -12,6 +12,9 @@ Parameters:
   TMDBApiKey:
     Type: String
     Default: none
+  MyMovieApiKey:
+    Type: String
+    Default: none
   
 Globals:
   Function:
@@ -37,7 +40,7 @@ Resources:
         RestrictPublicBuckets: true 
       OwnershipControls:
         Rules:
-          ObjectOwnership: BucketOwnerEnforced
+          - ObjectOwnership: BucketOwnerEnforced
       Tags:
         - Key: env
           Value: !Sub ${EnviromentType}
