@@ -811,6 +811,7 @@ Resources:
           Value: !Ref MyMovieAPIGateway.Stage
       Value: !Sub ${MyMovieApiKey}
 
+
 ###Lambda
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
