@@ -165,7 +165,7 @@ Resources:
       AccessLogSetting:
         DestinationArn: !GetAtt ApigwLogDeliveryStream.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }\n'
-      StageName: !Sub mymovie-${EnviromentType}-apigw
+      StageName: mymovie-apigw
       EndpointConfiguration:
         Type: REGIONAL
       DefinitionBody:
@@ -174,7 +174,7 @@ Resources:
           description: "get userid"
           version: "1.0"
           title: "mymovie"
-        basePath: "/MyMovieFunc"
+        basePath: "/mymovie-apigw"
         schemes:
         - "https"
         paths:
@@ -298,7 +298,7 @@ Resources:
               produces:
               - "application/json"
               parameters:
-              - name: "q"
+              - name: "topuser"
                 in: "query"
                 required: true
                 type: "string"
@@ -321,7 +321,7 @@ Resources:
                     responseParameters:
                       method.response.header.Access-Control-Allow-Origin: "'*'"
                 requestTemplates:
-                  application/json: "{\n  \"user\": \"$input.params('q')\"\n}"
+                  application/json: "{\n  \"user\": \"$input.params('topuser')\"\n}"
                 passthroughBehavior: "when_no_templates"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
@@ -360,13 +360,9 @@ Resources:
               produces:
               - "application/json"
               parameters:
-              - name: "user"
+              - name: "upduser"
                 in: "query"
                 required: false
-                type: "string"
-              - name: "a"
-                in: "query"
-                required: true
                 type: "string"
               responses:
                 "200":
@@ -382,7 +378,7 @@ Resources:
                   default:
                     statusCode: "200"
                 requestTemplates:
-                  application/json: "{\n  \"user\": \"$input.params('user')\"\n}"
+                  application/json: "{\n  \"user\": \"$input.params('upduser')\"\n}"
                 passthroughBehavior: "when_no_templates"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
@@ -807,7 +803,7 @@ Resources:
       Name: !Sub MyMovie-${EnviromentType}-apikey
       StageKeys: 
         - RestApiId: !Ref MyMovieAPIGateway
-          StageName: !Sub mymovie-${EnviromentType}-apigw
+          StageName: mymovie-apigw
       Tags: 
         - Key: "Env"
           Value: !Sub ${EnviromentType}
