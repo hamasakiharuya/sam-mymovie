@@ -807,6 +807,8 @@ Resources:
       Tags: 
         - Key: "Env"
           Value: !Sub ${EnviromentType}
+        - Key: "stage"
+          Value: !Ref MyMovieAPIGateway.Stage
       Value: !Sub ${MyMovieApiKey}
 
 ###Lambda
