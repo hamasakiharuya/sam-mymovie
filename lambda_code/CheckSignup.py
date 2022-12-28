@@ -7,10 +7,14 @@ def lambda_handler(event, context):
     new_username = event['username']
     new_email = event['email']
 
-    response = cognito.list_users(
-      UserPoolId = 'ap-northeast-1_R7kJOutuY',
-      AttributesToGet = ["email"],
-     )
+    try:
+        response = cognito.list_users(
+          UserPoolId = 'ap-northeast-1_R7kJOutuY',
+          AttributesToGet = ["email"],
+        )
+    except:
+        response_clear = {"statusCode": 200}
+        return json.dumps(response_clear)
 
     usernames = []
     emails = []

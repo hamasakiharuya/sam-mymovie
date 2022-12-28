@@ -1,4 +1,4 @@
-cognitoimport json
+import json
 import boto3
 
 dynamodb = boto3.client('dynamodb')

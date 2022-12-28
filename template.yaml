@@ -120,7 +120,7 @@ Resources:
       AutoVerifiedAttributes: 
         - email
       LambdaConfig: 
-        PostConfirmation: !GetAtt CheckSignupFunction.Arn
+        PostConfirmation: !GetAtt PosUseFunction.Arn
       Policies: 
         PasswordPolicy: 
           MinimumLength: 6
