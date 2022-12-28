@@ -817,7 +817,8 @@ Resources:
     Type: AWS::ApiGateway::UsagePlan
     Properties: 
       ApiStages:
-        - Stage: mymovie-apigw
+        - ApiId: !Ref MyMovieAPIGateway
+          Stage: mymovie-apigw
       Description: "APIkey for MyMovie ApiGateway"
       Tags: 
         - Key: "Env"
