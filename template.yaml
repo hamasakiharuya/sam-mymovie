@@ -166,6 +166,16 @@ Resources:
         DestinationArn: !GetAtt ApigwLogDeliveryStream.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }\n'
       StageName: mymovie-apigw
+      ApiKeySourceType: HEADER
+      Auth:
+        ApiKeyRequired: ture
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: "APIkey for MyMovie ApiGateway"
+          UsagePlanName: MyMovieUsagePlan
+          Tags:
+            - Key: env
+              Value: !Sub ${EnviromentType}
       EndpointConfiguration:
         Type: REGIONAL
       DefinitionBody:
