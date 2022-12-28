@@ -167,15 +167,6 @@ Resources:
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }\n'
       StageName: mymovie-apigw
       ApiKeySourceType: HEADER
-      Auth:
-        ApiKeyRequired: ture
-        UsagePlan:
-          CreateUsagePlan: PER_API
-          Description: "APIkey for MyMovie ApiGateway"
-          UsagePlanName: MyMovieUsagePlan
-          Tags:
-            - Key: env
-              Value: !Sub ${EnviromentType}
       EndpointConfiguration:
         Type: REGIONAL
       DefinitionBody:
@@ -820,7 +811,18 @@ Resources:
         - Key: "stage"
           Value: !Ref MyMovieAPIGateway.Stage
       Value: !Sub ${MyMovieApiKey}
-
+    
+###UsagePlan
+  MyMovieUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties: 
+      ApiStages: 
+        - Stage: !Ref MyMovieAPIGateway.Stage
+      Description: "APIkey for MyMovie ApiGateway"
+      Tags: 
+        - Key: "Env"
+          Value: !Sub ${EnviromentType}
+      UsagePlanName: !Sub MyMovie-${EnviromentType}-usageplan
 
 ###Lambda
   CheckSignupFunction:
