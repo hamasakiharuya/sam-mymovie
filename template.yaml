@@ -836,6 +836,7 @@ Resources:
             RestApiId:
               Ref: MyMovieAPIGateway
 
+
   GetUseIdFunction:
     Type: AWS::Serverless::Function 
     Properties:
