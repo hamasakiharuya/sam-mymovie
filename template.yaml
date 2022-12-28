@@ -843,6 +843,7 @@ Resources:
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonCognitoReadOnly
       Handler: CheckSignup.lambda_handler
       Runtime: python3.9
       Architectures:
