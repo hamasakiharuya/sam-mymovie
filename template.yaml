@@ -816,13 +816,22 @@ Resources:
   MyMovieUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     Properties: 
-      ApiStages: 
-        - Stage: !Ref MyMovieAPIGateway.Stage
+      ApiStages:
+        - Stage: mymovie-apigw
       Description: "APIkey for MyMovie ApiGateway"
       Tags: 
         - Key: "Env"
           Value: !Sub ${EnviromentType}
+        - Key: "stage"
+          Value: !Ref MyMovieAPIGateway.Stage
       UsagePlanName: !Sub MyMovie-${EnviromentType}-usageplan
+
+  MyMovieUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties: 
+      KeyId: !Ref MyMovieApikey
+      KeyType: API_KEY
+      UsagePlanId: !Ref MyMovieUsagePlan
 
 ###Lambda
   CheckSignupFunction:
