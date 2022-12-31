@@ -1053,6 +1053,15 @@ Resources:
     Type: AWS::Serverless::Function 
     Properties:
       FunctionName: !Sub PosUse-${EnviromentType}-func
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                cognito-idp.amazonaws.com
+            Action:
+              'sts:AssumeRole'
       Description: "resigter user when signup"
       Environment:
         Variables: 
