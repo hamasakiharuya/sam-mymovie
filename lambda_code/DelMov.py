@@ -3,11 +3,10 @@ import boto3
 from boto3.dynamodb.conditions import Key
 import os
 
-movie = os.environ['MovieTable']
-user = os.environ['UserTable']
-follow = os.environ['FollowTable']
-
 def lambda_handler(event, context):
+    movie = os.environ['MovieTable']
+    user = os.environ['UserTable']
+    follow = os.environ['FollowTable']
     dynamoDB = boto3.resource("dynamodb")
     movie_table = dynamoDB.Table(movie)
     user_table = dynamoDB.Table(user)

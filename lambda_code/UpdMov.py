@@ -3,17 +3,14 @@ import boto3
 import urllib.parse
 import os
 
-movie = os.environ['MovieTable']
-user = os.environ['UserTable']
-follow = os.environ['FollowTable']
-
-dynamodb = boto3.client('dynamodb')
-dynamoDB = boto3.resource("dynamodb")
-user_table = dynamoDB.Table(user)
-
 def lambda_handler(event, context):
-    
-    print(event);
+    movie = os.environ['MovieTable']
+    user = os.environ['UserTable']
+    follow = os.environ['FollowTable']
+
+    dynamodb = boto3.client('dynamodb')
+    dynamoDB = boto3.resource("dynamodb")
+    user_table = dynamoDB.Table(user)
     
     user_id = event["user_id"]
     title = event["title"]

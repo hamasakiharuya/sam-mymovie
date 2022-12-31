@@ -2,15 +2,14 @@ import json
 import boto3
 import os
 
-movie = os.environ['MovieTable']
-user = os.environ['UserTable']
-follow = os.environ['FollowTable']
-
-client = boto3.client('cognito-idp')
-dynamodb = boto3.client('dynamodb')
-
 def lambda_handler(event, context):
-    print(event)
+    movie = os.environ['MovieTable']
+    user = os.environ['UserTable']
+    follow = os.environ['FollowTable']
+
+    client = boto3.client('cognito-idp')
+    dynamodb = boto3.client('dynamodb')
+
     user = event["user"]
     
     responce = client.admin_get_user(
