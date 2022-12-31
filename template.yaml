@@ -46,6 +46,27 @@ Resources:
           Value: !Sub ${EnviromentType}
 
 ###IAM Role
+  APiGatewayRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - apigateway.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Description: "IamRole for apigateway to access dynamodb"
+        ManagedPolicyArns: 
+          - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+          - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        RoleName: !Sub "DynAccess-${EnviromentType}-apigw-role"
+        Tags: 
+          - Key: env
+            Value: !Sub "${EnviromentType}"
+            
   APiGatewayAccessLogRole:
     Type: AWS::IAM::Role
     Properties:
@@ -409,7 +430,7 @@ Resources:
               security:
               - api_key: []
               x-amazon-apigateway-integration:
-                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/APIGatewayToDynamodbRole"
+                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/DynAccess-${EnviromentType}-apigw-role"
                 httpMethod: "POST"
                 uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query"
                 responses:
@@ -418,10 +439,12 @@ Resources:
                     responseParameters:
                       method.response.header.Access-Control-Allow-Origin: "'*'"
                 requestTemplates:
-                  application/json: "{\n  \"TableName\": \"movie\",\n  \"IndexName\": \"title-user_id-index\"\
+                  application/json: !Sub 
+                    - "{\n  \"TableName\": \"${MovieTableName}\",\n  \"IndexName\": \"title-user_id-index\"\
                     ,\n  \"KeyConditions\": { \n    \"title\": {\n      \"ComparisonOperator\"\
                     :\"EQ\",\n      \"AttributeValueList\": [{\"S\": \"$input.params('title')\"\
                     }]\n      }\n  }\n}"
+                    - MovieTableName: !Ref MovieTable
                 passthroughBehavior: "when_no_templates"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
@@ -507,9 +530,11 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://d1z2nzx1vu4x24.cloudfront.net/index.html?list=register\"\
+                      application/json: !Sub 
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieCloudFrontDomain}/index.html?list=register\"\
                         )"
+                        - MyMovieCloudFrontDomain: !GetAtt MyMovieCloudFront.DomainName
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
@@ -543,8 +568,10 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://d1z2nzx1vu4x24.cloudfront.net/edit.html\")"
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieCloudFrontDomain}/edit.html\")"
+                        - MyMovieCloudFrontDomain: !GetAtt MyMovieCloudFront.DomainName
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
@@ -618,10 +645,12 @@ Resources:
                     responseParameters:
                       method.response.header.Access-Control-Allow-Origin: "'*'"
                 requestTemplates:
-                  application/json: "{\n  \"TableName\": \"follow\",\n  \"KeyConditions\"\
+                  application/json: !Sub
+                    - "{\n  \"TableName\": \"${FollowTableName}\",\n  \"KeyConditions\"\
                     : { \n    \"user_id\": {\n      \"ComparisonOperator\":\"EQ\",\n     \
                     \ \"AttributeValueList\": [{\"S\": \"$input.params('user_id')\"}]\n  \
                     \    }\n  }\n}"
+                    - FollowTableName: !Ref FollowTable
                 passthroughBehavior: "when_no_templates"
                 type: "aws"
             options:
@@ -972,6 +1001,124 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
+###CloudFront
+  MyMovieOrignAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties: 
+      OriginAccessControlConfig: 
+        Name: !Sub "mymovie-${EnviromentType}-${AWS::AccountId}.s3.samazonaws.com"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+  
+  MyMovieCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        CacheBehaviors: 
+          - AllowedMethods: 
+              - GET
+              - HEAD
+              - OPTIONS
+            DefaultTTL: 86400
+            ForwardedValues:
+              Headers: 
+                - Authorization
+                - X-REVISION-STRING
+              QueryString: true
+            LambdaFunctionAssociations: 
+              - EventType: viewer-request
+                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevMov-${EnviromentType}-func:3"
+            MaxTTL: 31536000
+            MinTTL: 0
+            PathPattern: /mymovie-apigw/user
+            TargetOriginId: MyMovieApi
+            ViewerProtocolPolicy: redirect-to-https
+          - AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            DefaultTTL: 86400
+            ForwardedValues: 
+              Headers: 
+                - Authorization
+                - X-REVISION-STRING
+              QueryString: true
+            LambdaFunctionAssociations: 
+              - EventType: viewer-request
+                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevFol-${EnviromentType}-func:3"
+            MaxTTL: 31536000
+            MinTTL: 0
+            PathPattern: /mymovie-apigw/follow
+            TargetOriginId: MyMovieApi
+            ViewerProtocolPolicy: redirect-to-https
+          - AllowedMethods: 
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            DefaultTTL: 86400
+            ForwardedValues: 
+              Headers: 
+                - Authorization
+              QueryString: true
+            MaxTTL: 31536000
+            MinTTL: 0
+            PathPattern: /mymovie-apigw/*
+            TargetOriginId: MyMovieApi
+            ViewerProtocolPolicy: redirect-to-https
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          DefaultTTL: 86400
+          ForwardedValues: 
+              QueryString: false
+          MaxTTL: 31536000
+          MinTTL: 0
+          TargetOriginId: MyMovieBacket
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: signin.html
+        Enabled: true
+        HttpVersion: http2
+        Logging:
+          Bucket: !Sub "cfaccesslog-${EnviromentType}-${AWS::AccountId}.s3.amazonaws.com"
+        Origins:
+          - CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: match-viewer
+              OriginSSLProtocols: 
+                - TLSv1.2
+            DomainName: !Sub
+              - "${ApigwId}.execute-api.ap-northeast-1.amazonaws.com"
+              - ApigwId: !GetAtt MyMovieAPIGateway.RootResourceId
+            Id: MyMovieApi
+            OriginCustomHeaders:
+              - HeaderName: x-api-key
+                HeaderValue: '{{resolve:ssm:MyMovieApiKey}}'
+          - DomainName: !Sub "mymovie-${EnviromentType}-${AWS::AccountId}.s3.amazonaws.com"
+            Id: MyMovieBacket
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !Ref MyMovieOrignAccessControl
+      Tags:
+        - Key: "Env"
+          Value: !Sub ${EnviromentType}
+
+
 ###Lambda
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
@@ -1246,9 +1393,9 @@ Resources:
             RestApiId:
               Ref: MyMovieAPIGateway
 
-Outputs:
-  APIGateWayID:
-    Description: "mymovie apigateway stage id"
-    Value: !GetAtt MyMovieAPIGateway.RootResourceId
-    Export:
-      Name: MyMovieApiGatewayId
+#Outputs:
+#  APIGateWayID:
+#    Description: "mymovie apigateway stage id"
+#    Value: !GetAtt MyMovieAPIGateway.RootResourceId
+#    Export:
+#      Name: MyMovieApiGatewayId
