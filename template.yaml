@@ -998,7 +998,6 @@ Resources:
   
   MyMovieCloudFront:
     Type: AWS::CloudFront::Distribution
-    DependsOn: MyMvoieApiKeyValue
     Properties:
       DistributionConfig:
         CacheBehaviors: 
