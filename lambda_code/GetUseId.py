@@ -3,18 +3,23 @@ import random
 import pdb
 import boto3
 from boto3.dynamodb.conditions import Key
+import os
+
+movie = os.environ['MovieTable']
+user = os.environ['UserTable']
+follow = os.environ['FollowTable']
 
 
 def lambda_handler(event, context):
     dynamodb = boto3.client('dynamodb')
     dynamoDB = boto3.resource("dynamodb")
-    movie_table = dynamoDB.Table("movie")
-    user_table = dynamoDB.Table("user")
+    movie_table = dynamoDB.Table(movie)
+    user_table = dynamoDB.Table(user)
 
 
     # DynamoDBへのquery処理実行
     queryData = dynamodb.scan(
-      TableName = 'user', 
+      TableName = user, 
       AttributesToGet = ["user_id"]
     )
     print(queryData)

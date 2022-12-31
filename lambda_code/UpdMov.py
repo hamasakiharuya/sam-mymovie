@@ -1,10 +1,15 @@
 import json
 import boto3
 import urllib.parse
+import os
+
+movie = os.environ['MovieTable']
+user = os.environ['UserTable']
+follow = os.environ['FollowTable']
 
 dynamodb = boto3.client('dynamodb')
 dynamoDB = boto3.resource("dynamodb")
-user_table = dynamoDB.Table("user")
+user_table = dynamoDB.Table(user)
 
 def lambda_handler(event, context):
     
@@ -20,7 +25,7 @@ def lambda_handler(event, context):
     print(decode2_movie)
     
     dynamodb.update_item(
-     TableName = 'movie',
+     TableName = movie,
      Key={
          'user_id': {"S": user_id},
          'title': {"S": decode2_movie}

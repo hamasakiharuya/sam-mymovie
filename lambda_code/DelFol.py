@@ -1,11 +1,16 @@
 import json
 import boto3
 from boto3.dynamodb.conditions import Key
+import os
+
+movie = os.environ['MovieTable']
+user = os.environ['UserTable']
+follow = os.environ['FollowTable']
 
 def lambda_handler(event, context):
     dynamoDB = boto3.resource("dynamodb")
-    follow_table = dynamoDB.Table("follow")
-    user_table = dynamoDB.Table("user")
+    follow_table = dynamoDB.Table(follow)
+    user_table = dynamoDB.Table(user)
     
     user_id = event['user_id']
     follow = event['follow']

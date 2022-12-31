@@ -834,11 +834,145 @@ Resources:
       KeyType: API_KEY
       UsagePlanId: !Ref MyMovieUsagePlan
 
+###dynamodb
+  MovieTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "user_id"
+          AttributeType: "S"
+        - 
+          AttributeName: "title"
+          AttributeType: "S"
+        - 
+          AttributeName: "releace"
+          AttributeType: "N"
+        - 
+          AttributeName: "score"
+          AttributeType: "N"
+        - 
+          AttributeName: "date"
+          AttributeType: "N"
+      KeySchema:
+        -
+          AttributeName: "user_id"
+          KeyType: "HASH"
+        -
+          AttributeName: "title"
+          KeyType: "RANGE"
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "title-user_id-index"
+          KeySchema:
+            -
+              AttributeName: "title"
+              KeyType: "HASH"
+            -
+              AttributeName: "user_id"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      LocalSecondaryIndexes:
+        - 
+          IndexName: "date-index"
+          KeySchema:
+            - 
+              AttributeName: "user_id"
+              KeyType: "HASH"
+            - 
+              AttributeName: "date"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+        -
+          IndexName: "releace-index"
+          KeySchema:
+            - 
+              AttributeName: "user_id"
+              KeyType: "HASH"
+            - 
+              AttributeName: "releace"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+        -
+          IndexName: "score-index"
+          KeySchema:
+            - 
+              AttributeName: "user_id"
+              KeyType: "HASH"
+            - 
+              AttributeName: "score"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      SSESpecification:
+        SSEEnabled: false
+      TableName: !Sub movie-${EnviromentType}-tb
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+  FollowTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "user_id"
+          AttributeType: "S"
+        - 
+          AttributeName: "follow"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "user_id"
+          KeyType: "HASH"
+        -
+          AttributeName: "follow"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      SSESpecification:
+        SSEEnabled: false
+      TableName: !Sub follow-${EnviromentType}-tb
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "user_id"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "user_id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      SSESpecification:
+        SSEEnabled: false
+      TableName: !Sub user-${EnviromentType}-tb
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
 ###Lambda
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      FunctionName: !Sub CheckSignu-${EnviromentType}-func
+      FunctionName: !Sub CheckSignup-${EnviromentType}-func
       Description: "check username and email when signup"
       CodeUri: lambda_code/
       Policies:
@@ -864,6 +998,11 @@ Resources:
     Properties:
       FunctionName: !Sub GetUseId-${EnviromentType}-func
       Description: "get a specific user"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -887,6 +1026,11 @@ Resources:
     Properties:
       FunctionName: !Sub GetUse-${EnviromentType}-func
       Description: "get specific users all movie"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -910,6 +1054,11 @@ Resources:
     Properties:
       FunctionName: !Sub PosUse-${EnviromentType}-func
       Description: "resigter user when signup"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -923,6 +1072,11 @@ Resources:
     Properties:
       FunctionName: !Sub UpdUse-${EnviromentType}-func
       Description: "update username"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -946,6 +1100,11 @@ Resources:
     Properties:
       FunctionName: !Sub PosMov-${EnviromentType}-func
       Description: "register movie"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -969,6 +1128,11 @@ Resources:
     Properties:
       FunctionName: !Sub DelMov-${EnviromentType}-func
       Description: "delete movie"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -992,6 +1156,11 @@ Resources:
     Properties:
       FunctionName: !Sub UpdMov-${EnviromentType}-func
       Description: "update movie score"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -1015,6 +1184,11 @@ Resources:
     Properties:
       FunctionName: !Sub PosFol-${EnviromentType}-func
       Description: "follow"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -1038,6 +1212,11 @@ Resources:
     Properties:
       FunctionName: !Sub DelFol-${EnviromentType}-func
       Description: "release follow"
+      Environment:
+        Variables: 
+          MovieTable: !Ref MovieTable
+          UserTable: !Ref UserTable
+          FollowTable: !Ref FollowTable
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonCognitoReadOnly
@@ -1062,6 +1241,3 @@ Outputs:
     Value: !GetAtt MyMovieAPIGateway.RootResourceId
     Export:
       Name: MyMovieApiGatewayId
-
-
-

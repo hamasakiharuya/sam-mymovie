@@ -1,5 +1,10 @@
 import json
 import boto3
+import os
+
+movie = os.environ['MovieTable']
+user = os.environ['UserTable']
+follow = os.environ['FollowTable']
 
 dynamodb = boto3.client('dynamodb')
 
@@ -12,7 +17,7 @@ def lambda_handler(event, context):
     replace_birthdate = birthdate.replace("-","")
     
     response = dynamodb.put_item(
-     TableName = 'user',
+     TableName = user,
      Item={
          'user_id': {"S": user_id},
          'birthdate': {"N": replace_birthdate},
