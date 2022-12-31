@@ -531,11 +531,9 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: !Sub 
-                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
                         \ = \"https://${MyMovieCloudFrontDomain}/index.html?list=register\"\
                         )"
-                        - MyMovieCloudFrontDomain: !GetAtt MyMovieCloudFront.DomainName
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
@@ -569,10 +567,8 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: !Sub
-                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
                         \ = \"https://${MyMovieCloudFrontDomain}/edit.html\")"
-                        - MyMovieCloudFrontDomain: !GetAtt MyMovieCloudFront.DomainName
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
