@@ -303,6 +303,10 @@ Resources:
                 in: "query"
                 required: true
                 type: "string"
+              - name: "list"
+                in: "query"
+                required: true
+                type: "string"
               responses:
                 "200":
                   description: "200 response"
@@ -322,7 +326,7 @@ Resources:
                     responseParameters:
                       method.response.header.Access-Control-Allow-Origin: "'*'"
                 requestTemplates:
-                  application/json: "{\n  \"user\": \"$input.params('topuser')\"\n}"
+                  application/json: "{\n  \"user\": \"$input.params('topuser')\",\n  \"list\": \"$input.params('list')\" \n}"
                 passthroughBehavior: "when_no_templates"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
