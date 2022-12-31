@@ -121,18 +121,6 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
-
-###SSM parameter
-  MyMvoieApiKeyValue:
-    Type: AWS::SSM::Parameter
-    Properties: 
-      Description: "MyMovie Apikey Value"
-      Name: "MyMovieApiKey"
-      Type: String
-      Value: !Sub ${MyMovieApiKey}
-      Tags:
-        env: !Sub ${EnviromentType}
-
 ###Cognito
   MyMovieUserPool:
     Type: AWS::Cognito::UserPool
@@ -1106,7 +1094,7 @@ Resources:
             Id: MyMovieApi
             OriginCustomHeaders:
               - HeaderName: x-api-key
-                HeaderValue: '{{resolve:ssm:MyMovieApiKey}}'
+                HeaderValue: !Sub ${MyMovieApiKey}
           - DomainName: !Sub "mymovie-${EnviromentType}-${AWS::AccountId}.s3.amazonaws.com"
             Id: MyMovieBacket
             S3OriginConfig:
