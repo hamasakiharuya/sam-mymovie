@@ -21,6 +21,7 @@ Globals:
     Timeout: 3
     MemorySize: 128
 
+
 Resources:
 ########## Config for APIGateWay AccessLog (S3 IAM Firehose)
 ###S3
