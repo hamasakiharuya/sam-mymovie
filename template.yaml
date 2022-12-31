@@ -25,6 +25,70 @@ Globals:
 Resources:
 ########## Config for APIGateWay AccessLog (S3 IAM Firehose)
 ###S3
+  AppBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault: 
+              SSEAlgorithm: AES256
+      BucketName: !Sub mymovie-${EnviromentType}-${AWS::AccountId}
+      LoggingConfiguration: 
+        DestinationBucketName: !Sub appaccesslog-${EnviromentType}-${AWS::AccountId}
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true 
+        BlockPublicPolicy: true 
+        IgnorePublicAcls: true 
+        RestrictPublicBuckets: true 
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+      WebsiteConfiguration: 
+        IndexDocument: signin.html
+
+  AppAccessLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault: 
+              SSEAlgorithm: AES256
+      BucketName: !Sub appaccesslog-${EnviromentType}-${AWS::AccountId}
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true 
+        BlockPublicPolicy: true 
+        IgnorePublicAcls: true 
+        RestrictPublicBuckets: true 
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+  CfAccessLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault: 
+              SSEAlgorithm: AES256
+      BucketName: !Sub cfaccesslog-${EnviromentType}-${AWS::AccountId}
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true 
+        BlockPublicPolicy: true 
+        IgnorePublicAcls: true 
+        RestrictPublicBuckets: true 
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
   ApiGwAccessLogBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -45,6 +109,48 @@ Resources:
       Tags:
         - Key: env
           Value: !Sub ${EnviromentType}
+
+###S3 BacketPolicy
+  AppBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AppBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "cloudfront.amazonaws.com"
+            Action: "s3:GetObject"
+            Resource: !Sub
+              - "arn:aws:s3:::${AppBucketName}/*"
+              - AppBucketName: !Ref AppBucket
+            Condition:
+              StringEquals:
+                "AWS:SourceArn": !Sub
+                  - "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontId}"
+                  - CloudFrontId: !GetAtt MyMovieCloudFront.Id
+
+  AppAccessLogBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AppAccessLogBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "logging.s3.amazonaws.com"
+            Action:
+              "s3:PutObject"
+            Resource: !Sub
+              - "arn:aws:s3:::${AppAccessLogBucketName}/*"
+              - AppAccessLogBucketName: !Ref AppAccessLogBucket
+            Condition:
+              ArnLike:
+                "aws:SourceArn": !Sub
+                  - "arn:aws:s3:::${AppBucketName}/*"
+                  - AppBucketName: !Ref AppBucket
 
 ###IAM Role
   APiGatewayRole:
