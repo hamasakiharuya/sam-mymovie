@@ -838,7 +838,7 @@ Resources:
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      FunctionName: !Sub CheckSignup-${EnviromentType}-func
+      FunctionName: !Sub CheckSignu-${EnviromentType}-func
       Description: "check username and email when signup"
       CodeUri: lambda_code/
       Policies:
