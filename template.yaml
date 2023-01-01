@@ -235,8 +235,8 @@ Resources:
         - email
       AutoVerifiedAttributes: 
         - email
-      LambdaConfig: 
-        PostConfirmation: !GetAtt PosUseFunction.Arn
+      #LambdaConfig: 
+      #  PostConfirmation: !GetAtt PosUseFunction.Arn
       Policies: 
         PasswordPolicy: 
           MinimumLength: 6
