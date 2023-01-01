@@ -4,13 +4,13 @@ import urllib.parse
 import os
 
 def lambda_handler(event, context):
-    movie = os.environ['MovieTable']
-    user = os.environ['UserTable']
-    follow = os.environ['FollowTable']
+    movie_tb = os.environ['MovieTable']
+    user_tb = os.environ['UserTable']
+    follow_tb = os.environ['FollowTable']
 
     dynamodb = boto3.client('dynamodb')
     dynamoDB = boto3.resource("dynamodb")
-    user_table = dynamoDB.Table(user)
+    user_table = dynamoDB.Table(user_tb)
     
     user_id = event["user_id"]
     title = event["title"]
@@ -22,7 +22,7 @@ def lambda_handler(event, context):
     print(decode2_movie)
     
     dynamodb.update_item(
-     TableName = movie,
+     TableName = movie_tb,
      Key={
          'user_id': {"S": user_id},
          'title': {"S": decode2_movie}

@@ -728,7 +728,7 @@ Resources:
               security:
               - api_key: []
               x-amazon-apigateway-integration:
-                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/APIGatewayToDynamodbRole"
+                credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/DynAccess-${EnviromentType}-apigw-role"
                 httpMethod: "POST"
                 uri: !Sub "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query"
                 responses:
@@ -1470,6 +1470,7 @@ Resources:
       CodeUri: lambda_code/
       Policies:
         - arn:aws:iam::aws:policy/AmazonCognitoReadOnly
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       Handler: DelFol.lambda_handler
       Runtime: python3.9
       Architectures:

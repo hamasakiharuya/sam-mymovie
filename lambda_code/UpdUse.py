@@ -3,9 +3,9 @@ import boto3
 import os
 
 def lambda_handler(event, context):
-    movie = os.environ['MovieTable']
-    user = os.environ['UserTable']
-    follow = os.environ['FollowTable']
+    movie_tb = os.environ['MovieTable']
+    user_tb = os.environ['UserTable']
+    follow_tb = os.environ['FollowTable']
 
     client = boto3.client('cognito-idp')
     dynamodb = boto3.client('dynamodb')
@@ -24,7 +24,7 @@ def lambda_handler(event, context):
             sns = i["Value"]
             
     dynamodb.update_item(
-     TableName = user,
+     TableName = user_tb,
      Key={
          'user_id': {"S": user},
      },

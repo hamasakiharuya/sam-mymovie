@@ -5,12 +5,13 @@ from boto3.dynamodb.conditions import Key
 import os
 
 def lambda_handler(event, context):
-    movie = os.environ['MovieTable']
-    user = os.environ['UserTable']
-    follow = os.environ['FollowTable']
+    movie_tb = os.environ['MovieTable']
+    user_tb = os.environ['UserTable']
+    follow_tb = os.environ['FollowTable']
+
     dynamoDB = boto3.resource("dynamodb")
-    movie_table = dynamoDB.Table(movie)
-    user_table = dynamoDB.Table(user)
+    movie_table = dynamoDB.Table(movie_tb)
+    user_table = dynamoDB.Table(user_tb)
     cognito  =  boto3.client("cognito-idp")
     
     user = event['user']
