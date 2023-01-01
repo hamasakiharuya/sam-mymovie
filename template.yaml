@@ -1196,7 +1196,7 @@ Resources:
                 - TLSv1.2
             DomainName: !Sub
               - "${ApigwId}.execute-api.ap-northeast-1.amazonaws.com"
-              - ApigwId: !GetAtt MyMovieAPIGateway.RootResourceId
+              - ApigwId: !Ref MyMovieAPIGateway
             Id: MyMovieApi
             OriginCustomHeaders:
               - HeaderName: x-api-key
