@@ -255,6 +255,7 @@ Resources:
           Name: "preferred_username"
           Required: true
         - AttributeDataType: "String"
+          Mutable: true
           Name: "website"
           Required: true
       UsernameConfiguration: 
@@ -596,7 +597,7 @@ Resources:
               - api_key: []
               x-amazon-apigateway-integration:
                 httpMethod: "POST"
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DelMovFunction.Arn}/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DelMovsFunction.Arn}/invocations"
                 responses:
                   default:
                     statusCode: "200"
@@ -1314,7 +1315,7 @@ Resources:
           Properties:
             UserPool:
               Ref: MyMovieUserPool
-            Trigger: PreSignUp
+            Trigger: PostConfirmation
 
   UpdUseFunction:
     Type: AWS::Serverless::Function 
