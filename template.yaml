@@ -1127,7 +1127,8 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        CNAMEs: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
+        CNAMEs:
+          - !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
         ViewerCertificate: 
           AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
           MinimumProtocolVersion: TLSv1.2_2021
