@@ -12,12 +12,12 @@ Parameters:
     AllowedValues:
       - prod
       - stg
-  ManageAccountId:
-    Type: String
-    Default: none
-  MyMovieCertificateId:
-    Type: String
-    Default: none
+  #ManageAccountId:
+  #  Type: String
+  #  Default: none
+  #MyMovieCertificateId:
+  #  Type: String
+  #  Default: none
   TMDBApiKey:
     Type: String
     Default: none
