@@ -19,7 +19,7 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ap-northeast-1
       # cryptography 39.0.0 は openssl 1.1.0 以前をサポートしなくなったため(https://github.com/aws/aws-sam-cli/issues/4527#issuecomment-1368871248)
-      - run: pip3 install --force-reinstall "cryptography==38.0.4"
+      - run: pip3 install pyopenssl==22.0.0
       # sam build 
       - run: sam build --use-container
       
