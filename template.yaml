@@ -1130,7 +1130,8 @@ Resources:
         CNAMEs:
           - !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
         ViewerCertificate: 
-          AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
+          #AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
+          AcmCertificateArn: arn:aws:acm:us-east-1:921495260049:certificate/0d833535-3ea3-4ccc-b946-e572138adfe5
           MinimumProtocolVersion: TLSv1.2_2021
           SslSupportMethod: sni-only
         CacheBehaviors: 
