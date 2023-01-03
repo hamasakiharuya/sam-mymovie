@@ -28,7 +28,7 @@ Parameters:
 Mappings:
   EnviromentMapping:
     prod:
-      Domain: mymovie.jp
+      DomainName: mymovie.jp
     stg:
       DomainName: stg.mymovie.jp
   
@@ -1128,9 +1128,8 @@ Resources:
     Properties:
       DistributionConfig:
         CNAMEs: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
-        ViewerCertificate: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
-          AcmCertificateArn: 
-          CloudFrontDefaultCertificate: false
+        ViewerCertificate: 
+          AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
           MinimumProtocolVersion: TLSv1.2_2021
           SslSupportMethod: sni-only
         CacheBehaviors: 
