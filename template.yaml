@@ -1121,7 +1121,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        CNAMEs:
+        Aliases:
           - !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
         CacheBehaviors: 
           - AllowedMethods: 
