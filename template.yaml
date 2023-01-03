@@ -9,12 +9,28 @@ Parameters:
   EnviromentType:
     Type: String
     Default: stg
+    AllowedValues:
+      - prod
+      - stg
+  ManageAccountId:
+    Type: String
+    Default: none
+  MyMovieCertificateId:
+    Type: String
+    Default: none
   TMDBApiKey:
     Type: String
     Default: none
   MyMovieApiKey:
     Type: String
     Default: none
+
+Mappings:
+  EnviromentMapping:
+    prod:
+      Domain: mymovie.jp
+    stg:
+      DomainName: stg.mymovie.jp
   
 Globals:
   Function:
@@ -626,9 +642,11 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://${MyMovieCloudFrontDomain}/index.html?list=register\"\
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/index.html?list=register\"\
                         )"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
@@ -662,8 +680,10 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://${MyMovieCloudFrontDomain}/edit.html\")"
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/edit.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
@@ -1107,6 +1127,12 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        CNAMEs: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
+        ViewerCertificate: !Sub "arn:aws:acm:us-east-1:${ManageAccountId}:certificate/${MyMovieCertificateId}"
+          AcmCertificateArn: 
+          CloudFrontDefaultCertificate: false
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
         CacheBehaviors: 
           - AllowedMethods: 
               - GET
