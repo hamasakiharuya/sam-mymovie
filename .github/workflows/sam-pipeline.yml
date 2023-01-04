@@ -33,7 +33,6 @@ jobs:
           pip3 install cfn-lint
           cfn-lint template.yaml
 
-
       #S3 create
       - id: check_s3_backet
         continue-on-error: true
