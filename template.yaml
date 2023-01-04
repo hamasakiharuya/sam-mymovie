@@ -165,7 +165,7 @@ Resources:
             Condition:
               ArnLike:
                 "aws:SourceArn": !Sub
-                  - "arn:aws:s3:::${AppBucketName}/*"
+                  - "arn:aws:s3:::${AppBucketName}"
                   - AppBucketName: !Ref AppBucket
 
 ###IAM Role
@@ -1146,7 +1146,7 @@ Resources:
               QueryString: true
             LambdaFunctionAssociations: 
               - EventType: viewer-request
-                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevMov-${EnviromentType}-func:3"
+                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevMov-${EnviromentType}-func:9"
             MaxTTL: 31536000
             MinTTL: 0
             PathPattern: /mymovie-apigw/user
@@ -1168,7 +1168,7 @@ Resources:
               QueryString: true
             LambdaFunctionAssociations: 
               - EventType: viewer-request
-                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevFol-${EnviromentType}-func:3"
+                LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevFol-${EnviromentType}-func:8"
             MaxTTL: 31536000
             MinTTL: 0
             PathPattern: /mymovie-apigw/follow
@@ -1511,10 +1511,3 @@ Resources:
             Method: delete
             RestApiId:
               Ref: MyMovieAPIGateway
-
-#Outputs:
-#  APIGateWayID:
-#    Description: "mymovie apigateway stage id"
-#    Value: !GetAtt MyMovieAPIGateway.RootResourceId
-#    Export:
-#      Name: MyMovieApiGatewayId

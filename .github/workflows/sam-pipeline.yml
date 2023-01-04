@@ -4,9 +4,12 @@ on:
       - master
 env:
   AWS_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsAccess-AllEnv-role
+
 jobs:
-  build-deploy:
+  build-deploy-staging:
     runs-on: ubuntu-latest
+    environment:
+      name: staging
     permissions:
       id-token: write
       contents: read
@@ -44,3 +47,46 @@ jobs:
 
 # sam deploy
       - run: sam deploy --no-disable-rollback --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_NAMED_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=stg TMDBApiKey=${{ secrets.TMDB_API_KEY }} MyMovieApiKey=${{ secrets.MyMovie_API_KEY }} MyMovieCertificateId=${{ secrets.MYMOVIE_CERTIFICATE_ID }}'
+
+  build-deploy-production:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-1
+      # cryptography 39.0.0 は openssl 1.1.0 以前をサポートしなくなったため(https://github.com/aws/aws-sam-cli/issues/4527#issuecomment-1368871248)
+      - run: $(dirname $(readlink $(which sam)))/pip install --force-reinstall "cryptography==38.0.4"
+      # sam build 
+      - run: sam build --use-container
+      
+      #test
+      #- run : pip install -r tests/requirements.txt 
+      #- run: pytest -s -k test_lambda_handler
+      - run: |
+          pip3 install cfn-lint
+          cfn-lint template.yaml
+
+      #S3 create
+      - id: check_s3_backet
+        continue-on-error: true
+        run: |
+          aws s3 ls s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+
+      - if: ${{ steps.check_s3_backet.outcome == 'failure' }}
+        run: |
+            aws s3 mb s3://sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }}/
+
+# Run Unit tests- Specify unit tests here 
+
+# sam deploy
+      - run: sam deploy --no-disable-rollback --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_NAMED_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=stg TMDBApiKey=${{ secrets.TMDB_API_KEY }} MyMovieApiKey=${{ secrets.MyMovie_API_KEY }} MyMovieCertificateId=${{ secrets.MYMOVIE_CERTIFICATE_ID }}'
+
