@@ -25,7 +25,7 @@ Parameters:
 Mappings:
   EnviromentMapping:
     prod:
-      DomainName: www.mymovie.jp
+      DomainName: mymovie.jp
     stg:
       DomainName: stg.mymovie.jp
   
