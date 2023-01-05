@@ -18,14 +18,13 @@ def lambda_handler(event, context):
     
     decode_movie = urllib.parse.unquote(title)
     decode2_movie = urllib.parse.unquote(decode_movie)
-    
-    print(decode2_movie)
+    decode_movie_remove_null = decode2_movie.replace('+', ' ')
     
     dynamodb.update_item(
      TableName = movie_tb,
      Key={
          'user_id': {"S": user_id},
-         'title': {"S": decode2_movie}
+         'title': {"S": decode_movie_remove_null}
      },
      AttributeUpdates = {
          'score': {
