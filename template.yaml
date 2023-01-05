@@ -1065,6 +1065,7 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
+
   FollowTable:
     Type: AWS::DynamoDB::Table
     Properties:
