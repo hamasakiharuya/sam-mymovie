@@ -1033,6 +1033,8 @@ Resources:
                   description: "500 response"
                   schema:
                     $ref: "#/definitions/Empty"
+                security:
+                - api_key: []
               x-amazon-apigateway-integration:
                 type: "aws"
                 httpMethod: "POST"
@@ -1041,8 +1043,10 @@ Resources:
                   default:
                     statusCode: "200"
                     responseTemplates:
-                      application/json: "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://d1z2nzx1vu4x24.cloudfront.net/user.html\")"
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/user.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                   ".*\"statusCode\": 500,.*":
                     statusCode: "500"
                   ".*\"statusCode\": 400,.*":
