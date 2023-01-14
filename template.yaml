@@ -1252,26 +1252,26 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
 
-    ContactTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        AttributeDefinitions:
-          - 
-            AttributeName: "contents"
-            AttributeType: "S"
-        KeySchema:
-          -
-            AttributeName: "contents"
-            KeyType: "HASH"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        SSESpecification:
-          SSEEnabled: false
-        TableName: !Sub contact-${EnviromentType}-tb
-        Tags:
-          - Key: env
-            Value: !Sub ${EnviromentType}
+  ContactTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "contents"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "contents"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      SSESpecification:
+        SSEEnabled: false
+      TableName: !Sub contact-${EnviromentType}-tb
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
 
 ###CloudFront
   MyMovieOrignAccessControl:
