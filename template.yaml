@@ -1033,8 +1033,8 @@ Resources:
                   description: "500 response"
                   schema:
                     $ref: "#/definitions/Empty"
-                security:
-                - api_key: []
+              security:
+              - api_key: []
               x-amazon-apigateway-integration:
                 type: "aws"
                 httpMethod: "POST"
