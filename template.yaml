@@ -1025,20 +1025,14 @@ Resources:
                   description: "200 response"
                   schema:
                     $ref: "#/definitions/Empty"
-                ".*\"statusCode\": 500,.*":
-                    statusCode: "500"
-                    responseTemplates:
-                      application/json: !Sub
-                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://${MyMovieDomain}/500.html\")"
-                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
-                  ".*\"statusCode\": 400,.*":
-                    statusCode: "400"
-                    responseTemplates:
-                      application/json: !Sub
-                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
-                        \ = \"https://${MyMovieDomain}/400.html\")"
-                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
+                "400":
+                  description: "400 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                "500":
+                  description: "500 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
               security:
               - api_key: []
               x-amazon-apigateway-integration:
@@ -1055,8 +1049,18 @@ Resources:
                         - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                   ".*\"statusCode\": 500,.*":
                     statusCode: "500"
+                    responseTemplates:
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/500.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                   ".*\"statusCode\": 400,.*":
                     statusCode: "400"
+                    responseTemplates:
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/400.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
                 requestTemplates:
                   application/x-www-form-urlencoded: "## convert HTTP POST data to JSON for\
                     \ insertion directly into a Lambda function\n\n## first we we set up our\
