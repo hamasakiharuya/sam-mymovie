@@ -37,7 +37,7 @@ def lambda_handler(event, context):
 
     try:
         response = cognito_client.list_users(
-            UserPoolId = 'userpool_id,
+            UserPoolId = userpool_id,
             AttributesToGet = ["email"]
         )
     except:

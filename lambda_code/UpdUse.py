@@ -22,7 +22,7 @@ def lambda_handler(event, context):
     #環境変数取得
     movie_tb = os.environ['MovieTable']
     user_tb = os.environ['UserTable']
-    follow_tb = os.environ['FollowTable']UserPoolID
+    follow_tb = os.environ['FollowTable']
     userpool_id = os.environ['UserPoolID']
 
     #各リソース取得
@@ -57,7 +57,7 @@ def lambda_handler(event, context):
             
     try:
         #dynamodbのユーザテーブル更新
-        dynamodb.update_item(
+        dynamodb_client.update_item(
             TableName = user_tb,
             Key={
                 'user_id': {"S": user},

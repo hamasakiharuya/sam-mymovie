@@ -2,6 +2,7 @@ import json
 import boto3
 import urllib.parse
 import re
+import os
 import traceback
 
 #エラーを返す

@@ -1025,14 +1025,20 @@ Resources:
                   description: "200 response"
                   schema:
                     $ref: "#/definitions/Empty"
-                "400":
-                  description: "400 response"
-                  schema:
-                    $ref: "#/definitions/Empty"
-                "500":
-                  description: "500 response"
-                  schema:
-                    $ref: "#/definitions/Empty"
+                ".*\"statusCode\": 500,.*":
+                    statusCode: "500"
+                    responseTemplates:
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/500.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
+                  ".*\"statusCode\": 400,.*":
+                    statusCode: "400"
+                    responseTemplates:
+                      application/json: !Sub
+                        - "#set($context.responseOverride.status = 302)\n#set($context.responseOverride.header.location\
+                        \ = \"https://${MyMovieDomain}/400.html\")"
+                        - MyMovieDomain: !FindInMap [EnviromentMapping, !Ref EnviromentType, DomainName]
               security:
               - api_key: []
               x-amazon-apigateway-integration:
@@ -1302,6 +1308,28 @@ Resources:
               - GET
               - HEAD
               - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            DefaultTTL: 0
+            ForwardedValues:
+              Headers: 
+                - Authorization
+              QueryString: true
+            MaxTTL: 0
+            MinTTL: 0
+            PathPattern: /mymovie-apigw/useremail
+            TargetOriginId: MyMovieApi
+            ViewerProtocolPolicy: redirect-to-https
+          - AllowedMethods: 
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
             DefaultTTL: 86400
             ForwardedValues:
               Headers: 
@@ -1549,6 +1577,7 @@ Resources:
           UserPoolID: !Ref MyMovieUserPool
       CodeUri: lambda_code/
       Policies:
+        - arn:aws:iam::aws:policy/AmazonCognitoReadOnly
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       Handler: UpdUse.lambda_handler
       Runtime: python3.9
