@@ -298,7 +298,7 @@ Resources:
       AccessLogSetting:
         DestinationArn: !GetAtt ApigwLogDeliveryStream.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }\n'
-      StageName: mymovie-apigw
+      StageName: api
       ApiKeySourceType: HEADER
       EndpointConfiguration:
         Type: REGIONAL
@@ -308,7 +308,7 @@ Resources:
           description: "get userid"
           version: "1.0"
           title: "mymovie"
-        basePath: "/mymovie-apigw"
+        basePath: "/api"
         schemes:
         - "https"
         paths:
@@ -1101,7 +1101,7 @@ Resources:
       Name: !Sub MyMovie-${EnviromentType}-apikey
       StageKeys: 
         - RestApiId: !Ref MyMovieAPIGateway
-          StageName: mymovie-apigw
+          StageName: api
       Tags: 
         - Key: "Env"
           Value: !Sub ${EnviromentType}
@@ -1115,7 +1115,7 @@ Resources:
     Properties: 
       ApiStages:
         - ApiId: !Ref MyMovieAPIGateway
-          Stage: mymovie-apigw
+          Stage: api
       Description: "APIkey for MyMovie ApiGateway"
       Tags: 
         - Key: "Env"
@@ -1323,7 +1323,7 @@ Resources:
               QueryString: true
             MaxTTL: 0
             MinTTL: 0
-            PathPattern: /mymovie-apigw/useremail
+            PathPattern: /api/useremail
             TargetOriginId: MyMovieApi
             ViewerProtocolPolicy: redirect-to-https
           - AllowedMethods: 
@@ -1345,7 +1345,7 @@ Resources:
                 LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevMovie-${EnviromentType}-func:1"
             MaxTTL: 31536000
             MinTTL: 0
-            PathPattern: /mymovie-apigw/user
+            PathPattern: /api/user
             TargetOriginId: MyMovieApi
             ViewerProtocolPolicy: redirect-to-https
           - AllowedMethods:
@@ -1367,7 +1367,7 @@ Resources:
                 LambdaFunctionARN: !Sub "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:GetRevFollow-${EnviromentType}-func:1"
             MaxTTL: 31536000
             MinTTL: 0
-            PathPattern: /mymovie-apigw/follow
+            PathPattern: /api/follow
             TargetOriginId: MyMovieApi
             ViewerProtocolPolicy: redirect-to-https
           - AllowedMethods: 
@@ -1385,7 +1385,7 @@ Resources:
               QueryString: true
             MaxTTL: 31536000
             MinTTL: 0
-            PathPattern: /mymovie-apigw/*
+            PathPattern: /api/*
             TargetOriginId: MyMovieApi
             ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
