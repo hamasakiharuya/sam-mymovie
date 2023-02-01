@@ -88,5 +88,5 @@ jobs:
 # Run Unit tests- Specify unit tests here 
 
 # sam deploy
-      - run: sam deploy --no-disable-rollback --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_NAMED_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=prod TMDBApiKey=${{ secrets.TMDB_API_KEY }} MyMovieApiKey=${{ secrets.MyMovie_API_KEY }} MyMovieCertificateId=${{ secrets.MYMOVIE_CERTIFICATE_ID }}'
+      - run: sam deploy --no-disable-rollback --no-confirm-changeset --no-fail-on-empty-changeset --stack-name mymovie --s3-bucket sam-mymovie-backet-${{ secrets.AWS_ACCOUNT_ID }} --capabilities CAPABILITY_NAMED_IAM --region ap-northeast-1 --parameter-overrides 'EnviromentType=prod LogAccountId=${{ secrets.LOG_ACCOUNT_ID }} TMDBApiKey=${{ secrets.TMDB_API_KEY }} MyMovieApiKey=${{ secrets.MyMovie_API_KEY }} MyMovieCertificateId=${{ secrets.MYMOVIE_CERTIFICATE_ID }}'
 

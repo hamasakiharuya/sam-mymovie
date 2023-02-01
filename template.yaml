@@ -12,6 +12,9 @@ Parameters:
     AllowedValues:
       - prod
       - stg
+  LogAccountId:
+    Type: String
+    Default: none
   MyMovieCertificateId:
     Type: String
     Default: none
@@ -48,7 +51,7 @@ Resources:
               SSEAlgorithm: AES256
       BucketName: !Sub mymovie-${EnviromentType}-${AWS::AccountId}
       LoggingConfiguration: 
-        DestinationBucketName: !Sub appaccesslog-${EnviromentType}-${AWS::AccountId}
+        DestinationBucketName: !Sub appaccesslog-${EnviromentType}-${LogAccountId}
       PublicAccessBlockConfiguration: 
         BlockPublicAcls: true 
         BlockPublicPolicy: true 
@@ -226,7 +229,7 @@ Resources:
             Resource:
               - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}"
               - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}/*"
-      PolicyName: !Sub "PutApigeLog-${EnviromentType}-policy"
+      PolicyName: !Sub "PutApigwLog-${EnviromentType}-policy"
       Roles: 
         - !Ref APiGatewayAccessLogRole
 
@@ -1408,7 +1411,7 @@ Resources:
         Enabled: true
         HttpVersion: http2
         Logging:
-          Bucket: !Sub "cfaccesslog-${EnviromentType}-${AWS::AccountId}.s3.amazonaws.com"
+          Bucket: !Sub "cfaccesslog-${EnviromentType}-${LogAccountId}.s3.amazonaws.com"
         Origins:
           - CustomOriginConfig:
               HTTPPort: 80
