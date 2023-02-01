@@ -32,7 +32,6 @@ Mappings:
     stg:
       DomainName: stg.mymovie.jp
   
-  
 Globals:
   Function:
     Timeout: 3
