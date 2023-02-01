@@ -32,6 +32,7 @@ Mappings:
     stg:
       DomainName: stg.mymovie.jp
   
+  
 Globals:
   Function:
     Timeout: 3
@@ -50,7 +51,7 @@ Resources:
               SSEAlgorithm: AES256
       BucketName: !Sub mymovie-${EnviromentType}-${AWS::AccountId}
       LoggingConfiguration: 
-        DestinationBucketName: !Sub appaccesslog-${EnviromentType}-${LogAccountId}
+        DestinationBucketName: !Sub appaccesslog-${EnviromentType}-${AWS::AccountId}
       PublicAccessBlockConfiguration: 
         BlockPublicAcls: true 
         BlockPublicPolicy: true 
@@ -64,7 +65,6 @@ Resources:
           Value: !Sub ${EnviromentType}
       WebsiteConfiguration: 
         IndexDocument: signin.html
-
 
   AppAccessLogBucket:
     Type: AWS::S3::Bucket
