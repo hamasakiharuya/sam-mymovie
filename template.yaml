@@ -227,8 +227,8 @@ Resources:
               - "s3:ListBucketMultipartUploads"
               - "s3:PutObject"
             Resource:
-              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}"
-              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${AWS::AccountId}/*"
+              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}"
+              - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}/*"
       PolicyName: !Sub "PutApigwLog-${EnviromentType}-policy"
       Roles: 
         - !Ref APiGatewayAccessLogRole
@@ -240,7 +240,7 @@ Resources:
       DeliveryStreamName: !Sub amazon-apigateway-${EnviromentType}-fh
       DeliveryStreamType: DirectPut
       ExtendedS3DestinationConfiguration:
-        BucketARN: !GetAtt ApiGwAccessLogBucket.Arn
+        BucketARN: !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}"
         RoleARN: !GetAtt APiGatewayAccessLogRole.Arn
       Tags:
         - Key: env
