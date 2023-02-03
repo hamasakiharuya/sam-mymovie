@@ -1804,7 +1804,7 @@ Resources:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
-      FilterPattern: ERRORs
+      FilterPattern: ERROR
       LogGroupName: !Sub
         - "/aws/lambda/${FunctionName}"
         - FunctionName: !Ref PosMovFunction
