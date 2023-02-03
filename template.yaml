@@ -1793,7 +1793,7 @@ Resources:
   CheckSignupFunctionCWLog:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
-      DestinationArn: !Sub "arn:aws:s3:::lambdaerrorlog-${EnviromentType}-${LogAccountId}"
+      DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
       FilterPattern: ERROR
       LogGroupName: !Sub
         - "/aws/lambda/${FunctionName}"
@@ -1803,7 +1803,7 @@ Resources:
   PosMovFunctionCWLog:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
-      DestinationArn: !Sub "arn:aws:s3:::lambdaerrorlog-${EnviromentType}-${LogAccountId}"
+      DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
       FilterPattern: ERRORs
       LogGroupName: !Sub
         - "/aws/lambda/${FunctionName}"
