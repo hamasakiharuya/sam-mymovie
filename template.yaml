@@ -229,6 +229,8 @@ Resources:
             Resource:
               - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}"
               - !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}/*"
+              - !Sub "arn:aws:s3:::lambdaerror-${EnviromentType}-${LogAccountId}"
+              - !Sub "arn:aws:s3:::lambdaerror-${EnviromentType}-${LogAccountId}/*"
       PolicyName: !Sub "PutApigwLog-${EnviromentType}-policy"
       Roles: 
         - !Ref APiGatewayAccessLogRole
@@ -241,6 +243,18 @@ Resources:
       DeliveryStreamType: DirectPut
       ExtendedS3DestinationConfiguration:
         BucketARN: !Sub "arn:aws:s3:::apigwaccesslog-${EnviromentType}-${LogAccountId}"
+        RoleARN: !GetAtt APiGatewayAccessLogRole.Arn
+      Tags:
+        - Key: env
+          Value: !Sub ${EnviromentType}
+
+  LambdaErrorLogDeliveryStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: !Sub amazon-lambdaerror-${EnviromentType}-fh
+      DeliveryStreamType: DirectPut
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !Sub "arn:aws:s3:::lambdaerrorlog-${EnviromentType}-${LogAccountId}"
         RoleARN: !GetAtt APiGatewayAccessLogRole.Arn
       Tags:
         - Key: env
@@ -1740,3 +1754,22 @@ Resources:
             Method: delete
             RestApiId:
               Ref: MyMovieAPIGateway
+
+###CloudWatchLogs SubscriptionFilter
+  CheckSignupFunctionCWLog:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties: 
+      DestinationArn: !Sub "arn:aws:s3:::lambdaerrorlog-${EnviromentType}-${LogAccountId}"
+      FilterPattern: ERROR
+      LogGroupName: !Sub
+        - "/aws/lambda/${FunctionName}"
+        - FunctionName: !Ref CheckSignupFunction
+
+  PosMovFunctionCWLog:
+    Type: AWS::Logs::SubscriptionFilter
+    Properties: 
+      DestinationArn: !Sub "arn:aws:s3:::lambdaerrorlog-${EnviromentType}-${LogAccountId}"
+      FilterPattern: ERRORs
+      LogGroupName: !Sub
+        - "/aws/lambda/${FunctionName}"
+        - FunctionName: !Ref PosMovFunction
