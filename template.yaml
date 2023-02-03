@@ -1798,6 +1798,7 @@ Resources:
       LogGroupName: !Sub
         - "/aws/lambda/${FunctionName}"
         - FunctionName: !Ref CheckSignupFunction
+      RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
   PosMovFunctionCWLog:
     Type: AWS::Logs::SubscriptionFilter
