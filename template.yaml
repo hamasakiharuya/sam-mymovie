@@ -211,6 +211,27 @@ Resources:
         - Key: env
           Value: !Sub "${EnviromentType}"
 
+  CWLtoKibesisFirehoseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                logs.ap-northeast-1.amazonaws.com
+            Action:
+              'sts:AssumeRole'
+            Condition:
+              StringLike:
+                "aws:SourceArn": !Sub "arn:aws:logs:ap-northeast-1:${AWS::AccountId}:*"
+      Description: "IamRole for cloudwatchlogs fron logs to firehose"
+      RoleName: !Sub "lambdaerrorlog-${EnviromentType}-logs-role"
+      Tags: 
+        - Key: env
+          Value: !Sub "${EnviromentType}"
+
 ###IAM Policy
   PutApigwLogPolicy:
     Type: AWS::IAM::Policy
@@ -234,6 +255,19 @@ Resources:
       PolicyName: !Sub "PutApigwLog-${EnviromentType}-policy"
       Roles: 
         - !Ref APiGatewayAccessLogRole
+
+  CWLtoKibesisFirehosePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Action: "firehose:*"
+            Resource: !Sub "arn:aws:firehose:ap-northeast-1:${AWS::AccountId}:*"
+      PolicyName: !Sub "PutFirehose-${EnviromentType}-policy"
+      Roles: 
+        - !Ref CWLtoKibesisFirehoseRole
 
 ###Firehose
   ApigwLogDeliveryStream:
@@ -1773,3 +1807,4 @@ Resources:
       LogGroupName: !Sub
         - "/aws/lambda/${FunctionName}"
         - FunctionName: !Ref PosMovFunction
+      RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
