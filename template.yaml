@@ -1789,6 +1789,73 @@ Resources:
             RestApiId:
               Ref: MyMovieAPIGateway
 
+###CloudWatchLogs
+  CheckSignupFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
+      RetentionInDays: 1
+
+PosConFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PosConFunction}
+      RetentionInDays: 1
+
+GetUseIdFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetUseIdFunction}
+      RetentionInDays: 1
+
+GetUseFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetUseFunction}
+      RetentionInDays: 1
+
+PosUseFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PosUseFunction}
+      RetentionInDays: 1
+
+UpdUseFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdUseFunction}
+      RetentionInDays: 1
+
+PosMovFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PosMovFunction}
+      RetentionInDays: 1
+
+DelMovFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
+      RetentionInDays: 1
+
+UpdMovFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdMovFunction}
+      RetentionInDays: 1
+
+PosFolFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PosFolFunction}
+      RetentionInDays: 1
+
+DelFolFunctionCWLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${DelFolFunction}
+      RetentionInDays: 1
+
 ###CloudWatchLogs SubscriptionFilter
   CheckSignupFunctionCWLog:
     Type: AWS::Logs::SubscriptionFilter
