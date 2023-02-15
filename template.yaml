@@ -1796,68 +1796,68 @@ Resources:
       LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
       RetentionInDays: 1
 
-PosConFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${PosConFunction}
-      RetentionInDays: 1
+  PosConFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${PosConFunction}
+        RetentionInDays: 1
 
-GetUseIdFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${GetUseIdFunction}
-      RetentionInDays: 1
+  GetUseIdFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${GetUseIdFunction}
+        RetentionInDays: 1
 
-GetUseFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${GetUseFunction}
-      RetentionInDays: 1
+  GetUseFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${GetUseFunction}
+        RetentionInDays: 1
 
-PosUseFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${PosUseFunction}
-      RetentionInDays: 1
+  PosUseFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${PosUseFunction}
+        RetentionInDays: 1
 
-UpdUseFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${UpdUseFunction}
-      RetentionInDays: 1
+  UpdUseFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${UpdUseFunction}
+        RetentionInDays: 1
 
-PosMovFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${PosMovFunction}
-      RetentionInDays: 1
+  PosMovFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${PosMovFunction}
+        RetentionInDays: 1
 
-DelMovFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
-      RetentionInDays: 1
+  DelMovFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
+        RetentionInDays: 1
 
-UpdMovFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${UpdMovFunction}
-      RetentionInDays: 1
+  UpdMovFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${UpdMovFunction}
+        RetentionInDays: 1
 
-PosFolFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${PosFolFunction}
-      RetentionInDays: 1
+  PosFolFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${PosFolFunction}
+        RetentionInDays: 1
 
-DelFolFunctionCWLog:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${DelFolFunction}
-      RetentionInDays: 1
+  DelFolFunctionCWLog:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/lambda/${DelFolFunction}
+        RetentionInDays: 1
 
 ###CloudWatchLogs SubscriptionFilter
-  CheckSignupFunctionCWLog:
+  CheckSignupFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1867,7 +1867,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref CheckSignupFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  PosConFunctionCWLog:
+  PosConFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1877,7 +1877,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref PosConFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  GetUseIdFunctionCWLog:
+  GetUseIdFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1887,7 +1887,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref GetUseIdFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  GetUseFunctionCWLog:
+  GetUseFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1897,7 +1897,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref GetUseFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  PosUseFunctionCWLog:
+  PosUseFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1907,7 +1907,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref PosUseFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  UpdUseFunctionCWLog:
+  UpdUseFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1917,7 +1917,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref UpdUseFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  PosMovFunctionCWLog:
+  PosMovFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1927,7 +1927,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref PosMovFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  DelMovFunctionCWLog:
+  DelMovFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1937,7 +1937,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref DelMovFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  UpdMovFunctionCWLog:
+  UpdMovFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1947,7 +1947,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref UpdMovFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  PosFolFunctionCWLog:
+  PosFolFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
@@ -1957,7 +1957,7 @@ DelFolFunctionCWLog:
         - FunctionName: !Ref PosFolFunction
       RoleArn: !GetAtt CWLtoKibesisFirehoseRole.Arn
 
-  DelFolFunctionCWLog:
+  DelFolFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
     Properties: 
       DestinationArn: !GetAtt LambdaErrorLogDeliveryStream.Arn
