@@ -1789,6 +1789,7 @@ Resources:
             RestApiId:
               Ref: MyMovieAPIGateway
 
+
 ###CloudWatchLogs
   CheckSignupFunctionCWLog:
     Type: AWS::Logs::LogGroup
