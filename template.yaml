@@ -1789,14 +1789,11 @@ Resources:
             RestApiId:
               Ref: MyMovieAPIGateway
 
-
 ###CloudWatchLogs
   CheckSignupFunctionCWLog:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub
-        - "/aws/lambda/${FunctionName}"
-        - FunctionName: !Ref CheckSignupFunction
+      LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
       RetentionInDays: 1
 
   PosConFunctionCWLog:
