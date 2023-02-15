@@ -1835,7 +1835,7 @@ Resources:
   DelMovFunctionCWLog:
       Type: AWS::Logs::LogGroup
       Properties:
-        LogGroupName: !Sub /aws/lambda/${CheckSignupFunction}
+        LogGroupName: !Sub /aws/lambda/${DelMovFunction}
         RetentionInDays: 1
 
   UpdMovFunctionCWLog:
