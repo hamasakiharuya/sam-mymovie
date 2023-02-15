@@ -1856,6 +1856,7 @@ Resources:
         LogGroupName: !Sub /aws/lambda/${DelFolFunction}
         RetentionInDays: 1
 
+
 ###CloudWatchLogs SubscriptionFilter
   CheckSignupFunctionCWLogSubscriptionFilter:
     Type: AWS::Logs::SubscriptionFilter
