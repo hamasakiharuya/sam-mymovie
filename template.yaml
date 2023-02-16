@@ -1483,7 +1483,6 @@ Resources:
         - Key: "Env"
           Value: !Sub ${EnviromentType}
 
-
 ###Lambda
   CheckSignupFunction:
     Type: AWS::Serverless::Function 
