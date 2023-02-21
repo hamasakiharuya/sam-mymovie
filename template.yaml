@@ -64,7 +64,7 @@ Resources:
         - Key: env
           Value: !Sub ${EnviromentType}
       WebsiteConfiguration: 
-        IndexDocument: signin.html
+        IndexDocument: about.html
 
   AppAccessLogBucket:
     Type: AWS::S3::Bucket
@@ -1455,7 +1455,7 @@ Resources:
           MinTTL: 0
           TargetOriginId: MyMovieBacket
           ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: signin.html
+        DefaultRootObject: about.html
         Enabled: true
         HttpVersion: http2
         Logging:
