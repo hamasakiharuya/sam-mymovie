@@ -12,6 +12,7 @@ Parameters:
     AllowedValues:
       - prod
       - stg
+      - test
   LogAccountId:
     Type: String
     Default: none
